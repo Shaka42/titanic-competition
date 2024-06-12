@@ -8,9 +8,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split,cross_val_score,KFold
 from sklearn.metrics import classification_report,confusion_matrix
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import GradientBoostingClassifier,HistGradientBoostingClassifier,ExtraTreesClassifier,AdaBoostClassifier,BaggingClassifier,StackingClassifier,IsolationForest,VotingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
 
 # %%
 df_train = pd.read_csv("train.csv")
@@ -86,23 +85,15 @@ Y_train = data['Survived'].values
 
 
 # %%
-model = {'LogisticRegression':0,'RandomForestClassifier':0,'Xgboost':0}
 logreg = LogisticRegression(solver='liblinear')
 Rclf = RandomForestClassifier()
-Xgboost = GradientBoostingClassifier(subsample= 0.8, n_estimators= 100, min_samples_split= 10, min_samples_leaf= 1,max_features= None, max_depth= 5, learning_rate= 0.01)
-his = HistGradientBoostingClassifier()
-ex = ExtraTreesClassifier()
-ada =AdaBoostClassifier()
-Bas = BaggingClassifier()
-#Vot = VotingClassifier()
-models =[logreg,Rclf,Xgboost,his,ex,ada,Bas]
-scores =list()
-for i in models:
+Xgboost = GradientBoostingClassifier(subsample= 0.9, n_estimators= 200, min_samples_split= 2, min_samples_leaf= 4,max_features= None, max_depth= 5, learning_rate= 0.1)
+models ={'Logistic Regression':logreg,'RandomForestClassifier':Rclf,'GradientBoosting Classifier':Xgboost}
+for i,k in models.items():
     Kf = KFold(n_splits=5,shuffle=True,random_state=42)
-    cross = cross_val_score(i,X_train,Y_train,cv=Kf)
-    scores.append(np.mean(cross))
-print(scores)
-    
+    cross = cross_val_score(k,X_train,Y_train,cv=Kf)
+    models[i]=np.mean(cross)
+print(models)
 
 
 # %%
